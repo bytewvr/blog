@@ -1,0 +1,46 @@
+markdown: kramdown
+kramdown:
+  syntax_highlighter: rouge
+  input: GFM
+  hard_wrap: false
+  syntax_highlighter_opts:
+    span:
+      line_numbers: false
+    block:
+      line_numbers: true
+      start_line: 1
+
+# Permalinks
+permalink:        ":year/:month/:day/:title.html"
+
+
+#Setup
+title:            nop.land
+tagline:          ''
+description:      'A blog about security, linux & engineering'
+url:              https://nop.land
+baseurl:
+excerpt_separator: "<!--more-->"
+remote_theme: fongandrew/hydeout
+paginate:         5
+
+#  name:           'Andrew Fong'
+#  url:            https://twitter.com/fongandrewc
+
+paginate:         5
+# paginate_path:    '/page:num'
+                    # Or '/blog/page:num' if you want to move your index pages
+
+plugins:
+  - jekyll-feed
+  - jekyll-gist
+  - jekyll-paginate
+  - liquid_reading_time
+  - liquid_pluralize
+
+# Sidebar link settings
+sidebar_home_link:  true
+# sidebar_blog_link:  '/blog'   # By default, your home page is your blog
+                                # page. If you change your paginate_path,
+                                # set this to the root of the paginate_path
+                                # to enable a separate blog link.
