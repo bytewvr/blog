@@ -2,9 +2,18 @@
 layout: post
 title: Linux OS - Following the terminal with ftrace
 ---
-This is the beginning of a series contemplating OS concepts discussed in the book [Operating Systems: Three Easy Pieces](https://pages.cs.wisc.edu/~remzi/OSTEP/). I recently found out about the tracer `ftrace` and am planning to use it throughout. 
+This is the beginning of a series contemplating OS concepts discussed in the book [Operating Systems: Three Easy Pieces](https://pages.cs.wisc.edu/~remzi/OSTEP/). I recently found out about the tracer `ftrace` and am planning to use it throughout the series. 
 # Base case
-Let's start with a small 'hello kernel' program and follow it's execution into the kernel. To reduce libc clutter we can compose a barebones version in assembler that makes only two syscalls write(1) and exit(60) and compile it with `gcc -o hello_kernel hello_kernel.s -nostdlib -static`. 
+Let's start with a small 'hello kernel' program and follow it's execution into the kernel. All codes are run on my test system running kernel version  `5.19.7` on `x86_64` architecture. For the `x86_64` architecture the syscall number is specified in rax and the arguments are passed through rdi, rsi, rdx, etc. If you have the kernel source at hand you can check the calling convention in `arch/x86/entry/calling.h`
+```
+x86 function call convention, 64-bit:
+-------------------------------------
+ arguments           |  callee-saved      | extra caller-saved | return
+[callee-clobbered]   |                    | [callee-clobbered] |
+---------------------------------------------------------------------------
+rdi rsi rdx rcx r8-9 | rbx rbp [*] r12-15 | r10-11             | rax, rdx [**]
+```
+To reduce libc clutter we can compose a barebones version in assembler that makes only two syscalls write(1) and exit(60) and compile it with `gcc -o hello_kernel hello_kernel.s -nostdlib -static`. 
 ```
 .global _start
 .intel_syntax noprefix
@@ -22,16 +31,7 @@ output:
     .ascii "hello kernel!\n\0"
 ```
 <!--more-->
-As my architecture follows the x86_64 architecture the syscall number is specified in rax and the arguments are passed through rdi, rsi, rdx, etc. If you have the kernel source at hand you can check the calling convention in `arch/x86/entry/calling.h`
-```
-x86 function call convention, 64-bit:
--------------------------------------
- arguments           |  callee-saved      | extra caller-saved | return
-[callee-clobbered]   |                    | [callee-clobbered] |
----------------------------------------------------------------------------
-rdi rsi rdx rcx r8-9 | rbx rbp [*] r12-15 | r10-11             | rax, rdx [**]
-```
-When strace'ing the assembly we get (as expected) two syscalls plus the additional execve that forks the bash process and turns the child into our hello_kernel process. 
+When strace'ing the assembly we get the expected two syscalls plus the additional execve that forks the bash process and turns the child into our hello_kernel process. 
 ```
 PROMPT> strace ./hello_kernel
   execve("./hello_kernel", ["./hello_kernel"], 0x7ffe01ead980 /* 37 vars */) = 0
