@@ -9,7 +9,7 @@ tags:
   - kernel
   - ASLR
 ---
-A short discussion about how to restore the symbol table of the Linux kernel `vmlinux`. To allow matching with addresses in the text segment I account for the address offset introduced by ASLR between the source and running kernel. With GDB set up like this I find struct member offsets. 
+A short discussion about how to restore the symbol table of the Linux kernel `vmlinux`. To allow matching with addresses in the text segment I account for the address offset introduced by ASLR between the source and running kernel. With GDB set up like this I find offsets of struct members used in the kernel.
 <!--more-->
 # Dressing the kernel executable
 The compressed kernel image `/boot/vmlinuz-<kernel version>` does not result in a kernel executable with a symbol table upon decompression. 
