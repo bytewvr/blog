@@ -1,10 +1,17 @@
 ---
 layout: post
 title: Linux OS - Following the terminal with ftrace
+category: linux
+date: 2022-09-10
+tags:
+  - ftrace
+  - terminal
+  - pty
 ---
-This is the beginning of a series contemplating OS concepts discussed in the book [Operating Systems: Three Easy Pieces](https://pages.cs.wisc.edu/~remzi/OSTEP/). I recently found out about the tracer `ftrace` and am planning to use it throughout the series. 
+This is the beginning of a series contemplating OS concepts discussed in the book [Operating Systems: Three Easy Pieces](https://pages.cs.wisc.edu/~remzi/OSTEP/). I recently found out about the tracer `ftrace` and am planning to use it throughout the series. This post dives into what happens on the kernel side when using the terminal. 
+<!--more-->
 # Base case
-Let's start with a small 'hello kernel' program and follow it's execution into the kernel. All codes are run on my test system running kernel version  `5.19.7` on `x86_64` architecture. For the `x86_64` architecture the syscall number is specified in rax and the arguments are passed through rdi, rsi, rdx, etc. If you have the kernel source at hand you can check the calling convention in `arch/x86/entry/calling.h`
+Let's start with a small 'hello kernel' program and follow its execution into the kernel. All codes are run on my test system running kernel version  `5.19.7` on `x86_64` architecture. For the `x86_64` architecture the syscall number is specified in rax and the arguments are passed through rdi, rsi, rdx, etc. If you have the kernel source at hand you can check the calling convention in `arch/x86/entry/calling.h`
 ```
 x86 function call convention, 64-bit:
 -------------------------------------
@@ -13,24 +20,24 @@ x86 function call convention, 64-bit:
 ---------------------------------------------------------------------------
 rdi rsi rdx rcx r8-9 | rbx rbp [*] r12-15 | r10-11             | rax, rdx [**]
 ```
-To reduce libc clutter we can compose a barebones version in assembler that makes only two syscalls write(1) and exit(60) and compile it with `gcc -o hello_kernel hello_kernel.s -nostdlib -static`. 
+To reduce libc clutter we can compose a bare bones version in assembler that makes only two syscalls write(1) and exit(60) and compile it with `gcc -o hello_kernel hello_kernel.s -nostdlib -static`. 
 ```
 .global _start
 .intel_syntax noprefix
 _start:
-    mov rdi, 1
-    lea rsi, [rip+output]
-    mov rdx, 20
-    mov rax, 1
-    syscall
+  mov rdi, 1
+  lea rsi, [rip+output]
+  mov rdx, 20
+  mov rax, 1
+  syscall
 
-    mov rax, 60
-    mov rdi, 42
-    syscall
+  mov rax, 60
+  mov rdi, 42
+  syscall
 output:
-    .ascii "hello kernel!\n\0"
+  .ascii "hello kernel!\n\0"
 ```
-<!--more-->
+
 When strace'ing the assembly we get the expected two syscalls plus the additional execve that forks the bash process and turns the child into our hello_kernel process. 
 ```
 PROMPT> strace ./hello_kernel
@@ -39,7 +46,7 @@ PROMPT> strace ./hello_kernel
   exit(42)                                = ?
   +++ exited with 42 +++
 ```
-while the inner-workings of each syscall is a black-box in userland, we can follow these calls into the kernel to explore what happens behind the curtain. To explore kernel space we can use the ftrace-wrapper trace-cmd which is readily available in modern linux kernels. The maintainer Steven Rostedt has amazing youtube videos online where he discusses the magic behind and use cases of ftrace. For the rest of the article mind that PIDs might change as snapshots were taken at different times. Using the wrapper trace-cmd with the appropriate flags we obtain output akin to the strace output above.
+while the inner-workings of each syscall is a black-box in userland, we can follow these calls into the kernel to explore what happens behind the curtain. To explore kernel space we can use the ftrace-wrapper trace-cmd which is readily available in modern Linux kernels. The maintainer Steven Rostedt has amazing youtube videos online where he discusses the magic behind and use cases of ftrace. For the rest of the article mind that PIDs might change as snapshots were taken at different times. Using the wrapper trace-cmd with the appropriate flags we obtain output akin to the strace output above.
 ```
 PROMPT> trace-cmd record -e syscalls -F ./hello_kernel
 PROMPT> trace-cmd report
@@ -74,7 +81,7 @@ PROMPT> pahole -C task_struct
   pid_t                      pid;                  /*  1512     4 */
   ...
 ```
-We see that the member pid is stored with an offset of 1512 bytes and consists itself of 4 bytes. This allows to set up a kprobe and obtain a trace
+We see that the member PID is stored with an offset of 1512 bytes and consists itself of 4 bytes. This allows to set up a kprobe and obtain a trace
 ```
 PROMPT> echo 'p:wake_up_probe try_to_wake_up pid=+1512(%di):s32' > /sys/kernel/tracing/kprobe_events
 PROMPT> trace-cmd -e wake_up_probe ./hello_kernel
@@ -84,13 +91,13 @@ PROMPT> trace-cmd report
   hello_kernel-9351  [011]    4516.614820: wake_up_probe:        (ffffffff9f0db3f0) pid=9338
   xfce4-terminal-9144  [004]  4516.614854: wake_up_probe:        (ffffffff9f0db3f0) pid=2682
 ```
-The trace report details how `hello_kernel` wakes up `kworker:7232` with pid 7232 which in turn wakes up our terminal emulator with pid 9144. This nicely coincides with our observation from the kernelshark plot. While this demonstrates how `xfce4-terminal` wakes up, it raises the question how our ELF is interacting with the terminal emulator to get the string to be displayed. To this end we can check how tty's are implemented in linux.
+The trace report details how `hello_kernel` wakes up `kworker:7232` with PID 7232 which in turn wakes up our terminal emulator with PID 9144. This nicely coincides with our observation from the kernelshark plot. While this demonstrates how `xfce4-terminal` wakes up, it raises the question of how our ELF is interacting with the terminal emulator to get the string to be displayed. To this end we can check how tty's are implemented in Linux.
 # Linux terminals
 While modern terminals (tty) still share some building blocks with predecessors, some rearrangement and separation of processes into kernel and user space has occurred. Using our example program from before the terminal emulator `xfce4-terminal` that listens to user input is at the master end of a PTY pair that asynchronously transmits any keyboard entries to the PTY slave. When first starting the terminal a shell will be connected to the PTY slave side, here `zsh`. The child `hello_kernel` will inherit the PTY slave stdin/stdout/stderr from zsh and can through them write data back to the PTY master. 
 While both `xfce4-terminal` and `hello_kernel` processes live in the userland, the PTY pair is part of the kernel. The following sketch illustrates the flow of text and is adapted from the book [The Linux Programming Interface](https://man7.org/tlpi/). 
 ![PTY pair](/assets/imgs/ftrace_terminal_PTY_pair.png)
 Sandwiched between master and slave are the line discipline and TTY driver. The line discipline only processes the output of the PTY master and not the output of the slave. To such end, the line discipline manages the character buffer, echoes the keystrokes back to the master for display and handles editing commands such as escape codes. Upon pressing `Enter` the buffered characters are copied by the TTY driver to the PTY slave. The line disciplines available on `Arch linux` can be found in `/proc/tty/ldisc` and in my case are the [default](https://docs.kernel.org/driver-api/tty/n_tty.html) `n_tty` and raw `n_null`. 
-To demonstrate connectednes between both sides of the pipe in our program we can obtain related PIDs through
+To demonstrate connectedness between both sides of the pipe in our program we can obtain related PIDs through
 ```
 PROMPT> ps -x --forest | grep 3487
   3461 pts/0    Sl+    0:00      \_ xfce4-terminal
@@ -101,7 +108,7 @@ PROMPT> ps -x --forest | grep 3487
 PROMPT> ls -la /proc/3461/fd | grep ptmx  
   lrwx------ 1 nop users 64 Sep  5 13:56 10 -> /dev/ptmx
 ```
-shows a link to the master clone device `/dev/ptmx`, demonstrating that `xfce4-terminal` is connected to the master end of a pty-pipe. In the file descriptors of the zsh shell we see that stdin/stdout/stderr are linked to the pseudo-terminal `pts1`.
+This listing shows a link to the master clone device `/dev/ptmx`, demonstrating that `xfce4-terminal` is connected to the master end of a pty-pipe. In the file descriptors of the zsh shell we see that stdin/stdout/stderr are linked to the pseudo-terminal `pts1`.
 ```
 PROMPT> ls -la /proc/3487/fd | grep pts
   lrwx------ 1 nop users 64 Sep  5 13:46 0 -> /dev/pts/1
@@ -174,15 +181,15 @@ We can use pahole again to find the offsets of the struct members. At tty_struct
 ```
 PROMPT> trace-cmd record -p function -l n_tty_write --func-stack ./hello_kernel
 PROMPT> trace-cmd report
-    hello_kernel-16635 [007] 11482.303964: function:             n_tty_write <-- file_tty_write.constprop.0
-    hello_kernel-16635 [007] 11482.303982: kernel_stack:         	=> ftrace_trampoline
-	=> n_tty_write
-	=> file_tty_write.constprop.0
-	=> new_sync_write
-	=> vfs_write
-	=> ksys_write
-	=> do_syscall_64
-	=> entry_SYSCALL_64_after_hwframe
+  hello_kernel-16635 [007] 11482.303964: function:             n_tty_write <-- file_tty_write.constprop.0
+  hello_kernel-16635 [007] 11482.303982: kernel_stack:         	=> ftrace_trampoline
+    => n_tty_write
+    => file_tty_write.constprop.0
+    => new_sync_write
+    => vfs_write
+    => ksys_write
+    => do_syscall_64
+    => entry_SYSCALL_64_after_hwframe
 ```
 The -l option is the same as echoing its argument into /sys/kernel/tracing/set_ftrace_filter when running ftrace without the trace-cmd wrapper
 
@@ -199,9 +206,8 @@ We see again that `hello_kernel` is connected to `PTY slave` (subtype=2), while 
 
 So the flow of events appear to be that `hello_kernel` writes the output string with `n_tty_write` to a buffer, queues up work, wakes up `kworker` which in turn wakes up `xfce4-terminal`  to write the string to the terminal.
 # Conclusion
-It was a great experience to experiment with ftrace and follow along in the linux kernel. Ftrace seems a great tool to investigate the scheduling process and memory management in the future. 
+It was a great experience to experiment with ftrace and follow along in the Linux kernel. Ftrace seems a great tool to investigate the scheduling process and memory management in the future. 
 
-----
 # Resources
 [Steven Rostedt - Learning the Linux Kernel with tracing](https://www.youtube.com/watch?v=JRyrhsx-L5Y)<br />
 [Alex Dzyoba - Ftrace](https://alex.dzyoba.com/blog/ftrace/)<br />
