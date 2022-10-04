@@ -65,7 +65,7 @@ sleep-5755  [000]  4879.035481: uc_other:             (ffffffff92ee5710) nr_swit
 However, only the last 5 nibbles match with where we expect it to be according to our executable. And furthermore, the above address will change between reboots of the system. 
 ```
 PROMPT> readelf -s vmlinux | grep update_curr$
- 14635: ffffffff810e5690   462 FUNC    LOCAL  DEFAULT    1 update_curr
+  14635: ffffffff810e5690   462 FUNC    LOCAL  DEFAULT    1 update_curr
 ```
 The reason for this randomized discrepancy is ASLR - a scheme to to protect against buffer overflow attacks. However, the offset is the same for all symbols and hence we can adjust GDB to get a match. Instead of running our kprobe we can just check for symbol position inside of `/proc/kallsyms` . `kallsyms` is created upon kernel boot and represents kernel data. As root we can obtain the same address as with the kprobe above
 ```
@@ -95,7 +95,7 @@ Here `t` denotes that the address of the `update_curr` call is in the text secti
 The text section (code) itself starts at
 ```
 PROMPT> sudo grep -w _stext /proc/kallsyms
-ffffffff92e00000 T _stext
+  ffffffff92e00000 T _stext
 ```
 We can just adjust our symbol table
 ```
@@ -104,7 +104,7 @@ PROMPT> gdb /usr/src/linux/vmlinux
   $1 = (<text variable, no debug info> *) 0xffffffff810e5710 <update_curr>
 (gdb) add-symbol-file /usr/src/linux/vmlinux -s .text 0xffffffff92e00000
 (gdb) p &update_curr
-$2 = (<text variable, no debug info> *) 0xffffffff92ee5710 <update_curr>
+  $2 = (<text variable, no debug info> *) 0xffffffff92ee5710 <update_curr>
 ```
 The address of the `update_curr` call now matches with the value reported by the previous `kprobe` and `/proc/kallsyms` - cool. We can also use GDB to navigate a raw memory dump of the Linux kernel presented as an ELF core file at `/proc/kcore` . 
 ```
