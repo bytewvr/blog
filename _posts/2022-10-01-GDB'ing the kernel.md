@@ -53,7 +53,7 @@ PROMPT> gdb vmlinux
     unsigned int h_nr_running;
   ...
 (gdb) p (int)&((struct cfs_rq *)0)->nr_running
-$1 = 16
+  $1 = 16
 ```
 However, if `/sys/kernel/btf/vmlinux` exists, structs can be more easily explored with  `pahole`. 
 
