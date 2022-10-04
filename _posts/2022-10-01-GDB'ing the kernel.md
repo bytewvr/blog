@@ -2,7 +2,7 @@
 layout: post
 title: GDBing the kernel
 category: linux 
-date: 2022-09-20
+date: 2022-10-01
 tags:
   - symbol table
   - GDB
@@ -46,13 +46,13 @@ We can also just compile the kernel, following along [instructions](https://wiki
 Having access to the symbols helps for disassembly and/or allows us to obtain offsets of members in structures used in the kernel. 
 ```
 PROMPT> gdb vmlinux
-gdb> ptype struct cfs_rq
+(gdb) ptype struct cfs_rq
   type = struct cfs_rq {
 	struct load_weight load;
     unsigned int nr_running;
     unsigned int h_nr_running;
   ...
-gdb> p (int)&((struct cfs_rq *)0)->nr_running
+(gdb) p (int)&((struct cfs_rq *)0)->nr_running
 $1 = 16
 ```
 However, if `/sys/kernel/btf/vmlinux` exists, structs can be more easily explored with  `pahole`. 
@@ -90,9 +90,10 @@ Here `t` denotes that the address of the `update_curr` call is in the text secti
 | -     | stab symbols in a.out file                 |
 | W / w | untagged weak object                       |
 | ?     | unknown                                    |
+
 The text section (code) itself starts at
 ```
-PROMPT#> sudo grep -w _stext /proc/kallsyms
+PROMPT> sudo grep -w _stext /proc/kallsyms
 ffffffff92e00000 T _stext
 ```
 We can just adjust our symbol table
