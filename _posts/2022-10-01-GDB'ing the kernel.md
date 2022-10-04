@@ -73,6 +73,7 @@ PROMPT> sudo grep update_curr$ /proc/kallsyms
   ffffffff92ee5710 t update_curr
 ```
 Here `t` denotes that the address of the `update_curr` call is in the text section of the executable. Other symbol types are
+
 | type  | description                                |
 | ----- | ------------------------------------------ |
 | A     | absolute                                   |
