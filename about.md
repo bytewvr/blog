@@ -1,13 +1,9 @@
 ---
 layout: page
-title: About
+title: About Steffen
 sidebar_link: true
 ---
 
-<p class="message">
-  Hey there! This page is included as an example. Feel free to customize it
-  for your own use upon downloading. Carry on!
-</p>
+Steffen is currently working as a research scientist developing future semiconductor inspection tools. In addition, he is attending the [https://pwn.college](https://pwn.college) course to explore the cyber security realm, loves programming in python and acquired a [CCNA](https://www.cisco.com/c/en/us/training-events/training-certifications/certifications/associate/ccna.html) certification earlier in 2022. 
 
-To make pages show up in the sidebar, add `sidebar_link: true` to the front
-matter.
+The opinions stated here are his own, not those of his employers – present, past, or future.
