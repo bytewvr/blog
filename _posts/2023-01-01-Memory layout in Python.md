@@ -75,7 +75,7 @@ The first ten numbers with the highest references to them are
 The high counts of variable references are striking. 
 ## Strings
 The PyUnicodeObject source code can be found [here](https://github.com/python/cpython/blob/3.10/Include/cpython/unicodeobject.h). The unicode-unique part starts after the header. I haven't seen flag structs before - the colon in the struct specifies the number of bits the element occupies. The flag struct occupies a total of 4-bytes, that seems to be qword aligned just before a temporary pointer that is later set to zero. 
-```Cpp
+```
 typedef struct {
 	PyObject_HEAD
 	Py_ssize_t length; /* Number of code points in the string */
@@ -117,7 +117,7 @@ To get to the data in lists we have to follow two-levels of indirection as the o
 00007f2e23d1c0f0 00007f2e23d1c110 
 00007f2e2097c6f0 0000000300006200
 ```
-Dumping the memory at one of these three addresses gets us to the `str` or `int` record `hexdump_memory(0x7f2e23d1c0f0, 32)`
+Dumping the memory at one of these three addresses gets us to the `str` or `int` records, here we go for the `int`: `hexdump_memory(0x7f2e23d1c0f0, 32)`. 
 ```
 0000000000000f67 00007f2e243a87c0 
 0000000000000001 0000000000000001
