@@ -8,10 +8,10 @@ tags:
   - memory layout
   - CPython
 ---
-I recently finished up a challenge from pwn.college where I needed to pass the address of a python bytestring (user space) to a Linux kernel module. Gdb'ing the memory occupied by python for its variables reminded me of a talk by [Brandon Rhodes - All Your Ducks In A Row: Data Structures in the Std Lib and Beyond - PyCon 2014](https://www.youtube.com/watch?v=fYlnfvKVDoM). In this post I investigate the memory layout of a few standard python objects such as `int`, `list` and `str` and the low-level structure array.
+I recently finished up a challenge from pwn.college where I needed to pass the address of a python bytestring (user space) to a Linux kernel module. For a mysterious reason the contained bytes started at a 32 bit offset - this post explores the reason for this offset in byte strings and to such end also discusses other common data types such as int, lists, strings and arrays.
 <!--more-->
 # Exploring CPython's Memory Layout
-Everything is an object in python and all python objects have a type and reference count. Both type and reference count are specified in the PyObject_HEAD that is part of the structure describing any object in python. According to [Python Developer's Guide - Garbage Collector Design](https://devguide.python.org/internals/garbage-collector/) a regular python object is arranged in memory as
+GDB'ing the memory occupied by python for its variables reminded me of a talk by [Brandon Rhodes - All Your Ducks In A Row: Data Structures in the Std Lib and Beyond - PyCon 2014](https://www.youtube.com/watch?v=fYlnfvKVDoM). Everything is an object in python and all python objects have a type and reference count. Both type and reference count are specified in the `PyObject_HEAD` that is part of the structure describing any object in python. According to [Python Developer's Guide - Garbage Collector Design](https://devguide.python.org/internals/garbage-collector/) a regular python object is arranged in memory as
 ```
 object -----> +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+ \
               |                    ob_refcnt                  | |
@@ -38,9 +38,9 @@ def hexdump_memory(address, n_bytes):
         if (i+1) % 2 == 0:
             print()
 ```
-A word of caution: the layout of memory for the data types discussed shouldn't change too often, but the following discussion is based on python version `3.10` 
-# Standard datatypes
-## Integers
+A word of caution: the layout of memory for the data types discussed shouldn't change too often, but the following discussion is based on python version `3.10` using the CPython interpreter. 
+# Warming up: common data types in memory
+## Standard: Integers
 Integers in [python 3.10](https://docs.python.org/3.10/c-api/long.html?highlight=integer) are implemented as `PyLongObjects` with arbitrary size. The declaration of the struct can be found [here](https://github.com/python/cpython/blob/3.10/Include/longintrepr.h)
 Let's define an integer in python
 ```python
@@ -74,7 +74,7 @@ The first ten numbers with the highest references to them are
 [[0, 7605], [1, 3953], [8, 1936], [2, 1695], [12, 1159], [-1, 1137], [4, 1125], [16, 1027], [3, 978], [20, 969]]
 ```
 The high counts of variable references are striking. 
-## Strings
+## Standard: Strings
 The `PyUnicodeObject` source code can be found [here](https://github.com/python/cpython/blob/3.10/Include/cpython/unicodeobject.h). The Unicode unique part starts after the header. I haven't seen flag structs before - the colon in the struct specifies the number of bits the element occupies. The flag struct occupies a total of 4-bytes, that seems to be QWORD aligned just before a temporary pointer that is later set to zero. 
 ```
 typedef struct {
@@ -100,7 +100,7 @@ and get this dump
 0061616161616161                         | <data>
 ```
 Using C under the hood, the string is also zero terminated. This shows in the 7th QWORD that consists of 7 `0x61` with a trailing `0x00`. 
-## Lists
+## Standard: Lists
 Turning to lists,
 ```python
 var = [1, 2, 'aaaaaaa']
@@ -123,8 +123,7 @@ Dumping the memory at one of these three addresses gets us to the `str` or `int`
 0000000000000f67 00007f2e243a87c0 
 0000000000000001 0000000000000001
 ```
-
-# Low-level data structures: array
+## Low-level: array
 This final section explores a low-level data structure: the [array](https://github.com/python/cpython/blob/85dd6cb6df996b1197266d1a50ecc9187a91e481/Modules/arraymodule.c). Using the array module we create an unsigned long long array with two elements. 
 ```python
 import array
@@ -143,8 +142,30 @@ Dumping the memory at address `0x7f2dfedd2ab0` demonstrates that array data type
 ffffffffffffffff ffffffffffffffff 
 00007f2dfedd2b10 00007f2dfe9421d0 
 ```
+
+# Finding the 32-bit offset in byte strings
+The [source code](https://github.com/python/cpython/blob/3.10/Include/cpython/bytesobject.h) of the `PyBytesObject` reveals the following struct (with stripped comments)
+```
+typedef struct {
+	PyObject_VAR_HEAD
+	Py_hash_t ob_shash;
+	char ob_sval[1];
+} PyBytesObject;
+```
+With 3 QWORDs occupied by `PyObject_VAR_HEAD` and 1 QWORD used up by `Py_hash_t` we might have found our 32-bit offset. 
+```python
+var = b'aaa'
+hexdump_memory(id(var), sys.getsizeof(var))
+```
+results in the memory dump of
+```
+0000000000000002 00007f2e243ad220      | <reference-count> <address of type> 
+0000000000000003 7098aa24b5a74ca3      | <obj size>        <hash>
+0000000000616161                       | <data>
+```
+Our data is indeed starting after 4 initial QWORDs (32 bits). Great!
 # Conclusion
-It was interesting to see how python handles memory under the hood. Upgraded my understanding of how objects are stored in memory and learned two completely new things: standard integer values defined at startup and C bit flag structs.
+It was nice to get to the bottom of the 32-bit offset of the data stored in byte strings. Furthermore, I upgraded my understanding of how other python objects are stored in memory and learned two completely new things: standard integer values defined at startup and C bit flag structs.
 # Additional Resources
 [RealPython - Memory Management in Python](https://realpython.com/python-memory-management/#the-default-python-implementation)
 
