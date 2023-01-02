@@ -124,7 +124,7 @@ Dumping the memory at one of these three addresses gets us to the `str` or `int`
 ```
 
 # Low-level data structures: array
-This final section explores a low-level data structure: the array. Using the array module we create a unsigned long long array with two elements. 
+This final section explores a low-level data structure: the [array](https://github.com/python/cpython/blob/85dd6cb6df996b1197266d1a50ecc9187a91e481/Modules/arraymodule.c). Using the array module we create a unsigned long long array with two elements. 
 ```python
 import array
 a = array.array('Q', [2**64-1, 2**64-1])
@@ -132,12 +132,10 @@ hexdump_memory(id(a), sys.getsizeof(a))
 ```
 The dump results in
 ```
-0000000000000001 000055b13ad5dcd0 
-0000000000000002 00007f2dfedd2ab0 
-0000000000000002 00007f2e2450aa40 
-0000000000000000 0000000000000000 
-00007f2dfe912740 00007f2dfe9129c0 
-0000000000000001 00007f2e243a6340
+0000000000000001 000055b13ad5dcd0        | <reference-count> <address of type> 
+0000000000000002 00007f2dfedd2ab0        | <obj size>        <address of elements>
+0000000000000002 00007f2e2450aa40        | <allocated elems> <array descr>
+0000000000000000 0000000000000000        | <weak refs>       <exported buffers>
 ```
 Dumping the memory at address `0x7f2dfedd2ab0` demonstrates that array datatypes require one layer of indirection less than lists by specifying the numerical datatype at declaration of the array and only allowing one datatype accross the array. In lists this dump would show the addresses of the elements instead of their numerical value `2**64-1 == 0xffffffffffffffff`
 ```
