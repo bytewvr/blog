@@ -41,14 +41,14 @@ def hexdump_memory(address, n_bytes):
 A word of caution: the layout of memory for the data types discussed shouldn't change too often, but the following discussion is based on python version `3.10` using the CPython interpreter. 
 # Warming up: common data types in memory
 ## Standard: Integers
-Integers in [python 3.10](https://docs.python.org/3.10/c-api/long.html?highlight=integer) are implemented as `PyLongObjects` with arbitrary size. The declaration of the struct can be found [here](https://github.com/python/cpython/blob/3.10/Include/longintrepr.h)
-Let's define an integer in python
+Integers are implemented as `PyLongObjects` with [arbitrary size](https://docs.python.org/3.10/c-api/long.html?highlight=integer). The declaration of the struct can be found [here](https://github.com/python/cpython/blob/3.10/Include/longintrepr.h).
+Let's define an integer and dump the memory
 ```python
 var = 1000
 n_bytes = sys.getsizeof(var)
 hexdump_memory(id(var), n_bytes)        
 ```
-This leads to this memory dump, with annotations to the right
+This leads to this memory dump displayed in hexadecimal, with annotations to the right
 ```
 0000000000000001 00007f01b97a87c0  | <reference-count> <address of type>
 0000000000000001 00007f01000003e8  | <obj size>        <data>
