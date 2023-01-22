@@ -208,7 +208,7 @@ The debug printout shows that we only get one call to the new and init dunder me
 I presented two methods that keep our pyqtSignal descriptor connected to its receivers. It was definitely quite a treat to learn about metaclasses. 
 
 # Additional Resources
-https://stackoverflow.com/questions/59459770/receiving-pyqtsignal-from-singleton <br />
-https://www.honeybadger.io/blog/python-instantiation-metaclass/ by Rupesh Mishra <br />
+[stackoverflow - Receiving pyqtsignal from singleton](https://stackoverflow.com/questions/59459770/receiving-pyqtsignal-from-singleton) <br />
+[Understanding Object Instantiation and Metaclasses in Python](https://www.honeybadger.io/blog/python-instantiation-metaclass/) by Rupesh Mishra <br />
 [Python’s super() considered super!](https://rhettinger.wordpress.com/2011/05/26/super-considered-super/) by Raymond Hettinger
 
