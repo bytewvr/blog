@@ -9,7 +9,7 @@ tags:
   - python
   - Singleton
 ---
-I recently needed to limit the number of instances of particular classes to 1 - the singleton design pattern seemed an obvious choice, but in Python the implementation of the Singleton prooved to be harder to implement correctly for involving pyqtSignals. 
+I recently needed to limit the number of instances of particular classes to 1 - the singleton design pattern seemed an obvious choice, but in Python the implementation of the Singleton proved to be harder to implement correctly when involving pyqtSignals. 
 
 <!--more-->
 
@@ -55,7 +55,7 @@ class myClass():
 a = myClass()
 b = myClass()
 ```
-While both both `a` and `b` are the same instance to `myClass` (see their address on the stack below),  `__init__` is called twice.
+While both `a` and `b` are a reference to the same instance of `myClass` (see their address on the stack below),  `__init__` is called twice.
 ```
 [   __new__():  9] New instance: <class '__main__.myClass'>
 [   __new__(): 10] <__main__.myClass object at 0x7fd9417cb6d0>
@@ -63,7 +63,7 @@ While both both `a` and `b` are the same instance to `myClass` (see their addres
 [   __new__(): 10] <__main__.myClass object at 0x7fd9417cb6d0>
 [  __init__():  3] Init - <class '__main__.myClass'>
 ```
-We can prevent running `__init__` twice by placing another variable after initialization - easy enough. At this point I thought I was done, however something peculiar happened ones I started using these singletons in objects that made us of signals   `pyqtSignals`. Here I added functionality to emit signals from the class and after creating two instances of my singleton class I emitted a signal from both references. 
+We can prevent running `__init__` twice by placing another variable after initialization - easy enough. At this point I thought I was done, however something peculiar happened once I started using these singletons in objects that made use of signals   `pyqtSignals`. Here I added functionality to emit signals from the class and after creating two instances of my singleton class. 
 ```python
 from PyQt5.QtCore import QObject, pyqtSignal
 
@@ -109,7 +109,7 @@ I expected two messages from both `responderA()` and `responderB()`, but I got t
 [responderB(): 27] signal
 [responderB(): 27] signal
 ```
-While `b` is a refernence to the same object due to the singleton nature, the signal seems to be disconnected from `responderA()`. We can check the number of receivers a signal is connected to with 
+While `b` is a referenced to the same object due to the singleton nature, the signal seems to be disconnected from `responderA()`. We can check the number of receivers a signal is connected to with 
 ```python
 def number_of_signal_receivers(instance, signal_name):
     return QObject.receivers(instance, instance.__getattr__(signal_name))
@@ -124,14 +124,14 @@ b = myClass()
 b.signal.connect(responderB)
 print(number_of_signal_receivers(b, b'signal'))
 ```
-and omitting the debug output we observe that the receiver count is not increasing after connecting `responderB()` to our signal. 
+Omitting the debug output we observe that the receiver count is not increasing after connecting `responderB()` to our signal. 
 ```
 1
 1
 ```
 How do we fix this? 
 # Solution 1
-After creating the object instance and connecting a signal any subsequent call to ```__init__()``` will wipe out our previous connections. We could try to restrict the init to the first call with
+After creating the object instance and connecting a signal any subsequent call to ```__init__()``` will wipe out our previous connections. We could try to restrict the init-call to the first call with
 ```python
 class myClass(QObject):
     signal = pyqtSignal(object)
@@ -144,10 +144,10 @@ class myClass(QObject):
 			self._initialized = True
    ...
 ```
-this leads to properly connected signals as the increase in the receiver counts after the second print of the `number_of_signal_receivers()` demonstrates. 
+This leads to properly connected signals as the increase in the receiver counts after the second print of the `number_of_signal_receivers()` demonstrates. 
 # Solution 2
-However, we can also prevent the second call to`__init__()` alltogether using metaclasses. While all objects in Python ultimately inherit from Object, the factory that generates the object is the `type` class. `type(object)` , `type(myClass)` results in `type` (or a Qt wrapper such as `sip.wrappertype`). As it is generating classes it is called a metaclass. 
-When we write `myClass()` the metaclass' `__call__` gets called (in this case belonging to `type`). Then if `__new__` and `__init__` are defined in the child class they will be called or the methods from the object class respectively. We can inject our own Singleton metaclass into the game to prevent a call to `__new__` and `__init__` alltogether.
+However, we can also prevent the second call to`__init__()` altogether using metaclasses. While all objects in Python ultimately inherit from Object, the factory that generates the object is the `type` class. `type(object)` , `type(myClass)` results in `type` (or a Qt wrapper such as `sip.wrappertype`). As it is generating classes it is called a metaclass. 
+When we write `myClass()` the metaclass' `__call__` gets called (in this case belonging to `type`). Then if `__new__` and `__init__` are defined in the child class they will be called or the methods from the object class respectively. We can inject our own Singleton metaclass into the game to prevent a call to `__new__` and `__init__` altogether.
 ```python
 class Singleton(type(QObject), type):
     def __call__(cls, *args, **kwargs):
@@ -209,6 +209,6 @@ I presented two methods that keeps our pyqtSignal descriptor connected to its re
 
 # Additional Resources
 https://stackoverflow.com/questions/59459770/receiving-pyqtsignal-from-singleton </br>
-https://www.honeybadger.io/blog/python-instantiation-metaclass/ </br>
+https://www.honeybadger.io/blog/python-instantiation-metaclass/ by Rupesh Mishra </br>
 [Python’s super() considered super!](https://rhettinger.wordpress.com/2011/05/26/super-considered-super/) by Raymond Hettinger </br>
 
