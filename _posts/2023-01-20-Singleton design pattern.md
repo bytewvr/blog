@@ -63,7 +63,7 @@ While both `a` and `b` are a reference to the same instance of `myClass` (see th
 [   __new__(): 10] <__main__.myClass object at 0x7fd9417cb6d0>
 [  __init__():  3] Init - <class '__main__.myClass'>
 ```
-We can prevent running `__init__` twice by placing another variable after initialization - easy enough. At this point I thought I was done, however something peculiar happened once I started using these singletons in objects that made use of signals   `pyqtSignals`. Here I added functionality to emit signals from the class and after creating two instances of my singleton class. 
+While just an annoyance in the case above, something peculiar happened once I started adding signals ( `pyqtSignals`) to the mix. In the following snippet I added signals to the class and connected two receivers after instantiation. 
 ```python
 from PyQt5.QtCore import QObject, pyqtSignal
 
