@@ -189,7 +189,7 @@ print(number_of_signal_receivers(b, b'signal'))
 a.emit_signal()
 b.emit_signal()
 ```
-The debug printout shows that we only get one call to the new and init dunder methods of our `myClass`, and the signals retain their connection - pretty sweet.
+The debug printout shows that we only get one call to the new and init dunder methods of our `myClass`, and the signal retains its connections - pretty sweet.
 ```
 [   myClass(): 22] signal init -  <unbound PYQT_SIGNAL PyQt_PyObject)>
 [  __call__(): 13] Singleton <class '__main__.Singleton'>
