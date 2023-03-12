@@ -58,6 +58,7 @@ table.rouge-table {
     margin-bottom: 1rem;
     vertical-align: top;
     &.rouge-gutter {
+      overflow-x: hidden;
       min-width: 3rem;
       width: 3rem;
       text-align: right;
