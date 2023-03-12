@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Workflow optimization in Windows/Linux
+title: Rapid screenshots in Windows & Linux
 category: workflow
 date: 2023-03-12 
 tags:
