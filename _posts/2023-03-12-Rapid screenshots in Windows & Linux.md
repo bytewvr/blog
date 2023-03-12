@@ -12,7 +12,7 @@ tags:
 Both at work and at home I am heavily using screenshot tools to document findings and highlight meeting content. This short post documents how to assign shortcuts in both windows and Linux for e.g. rapid-fire screenshot taking. Both solutions can also be used for other shortcuts.
 <!--more-->
 # Windows
-At work I frequently use several tools: the file explorer `MultiCommander`, and the screenshot program `greenshot`. With the tool `autohotkey` we can generate scripts that allow us to reassign keys and map them to launch programs or emit other keys. I mapped my two left mouse side-buttons to take a whole screen screenshot (for rapid fire moments) and to open a selection grab. Furthermore, I reassigned the win+e shortcut to open MultiCommander instead of the windows file explorer. The autohotkey script looks as follows 
+At work I frequently use several tools: the file explorer `MultiCommander`, and the screenshot program `greenshot`. With the tool [autohotkey](https://www.autohotkey.com/) we can generate scripts that allow us to reassign keys and map them to launch programs or emit other keys. I mapped my two left mouse side-buttons to take a whole screen screenshot (for rapid fire moments) and to open a selection grab. Furthermore, I reassigned the win+e shortcut to open `MultiCommander` instead of the windows file explorer. The `autohotkey` script looks as follows 
 ```
 XButton1:F11
 XButton2:Send ^{PrintScreen}
