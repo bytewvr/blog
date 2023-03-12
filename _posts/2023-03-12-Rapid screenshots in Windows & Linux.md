@@ -21,7 +21,7 @@ return
 ```
 # Linux
 The `flameshot` screenshot utility is just amazing. In Linux we can use `xev` to find the name of specific keys (also mouse-buttons). For me the two left side-buttons of the mouse are button8 and button9. `Autohotkey` is not available in Linux, but usually your window manager allows you to bind keys to specific actions. I am using the window manager i3 that also supports [mousebindings](https://i3wm.org/docs/userguide.html#mousebindings)
-and to run scripts upon a keypress. We can just add either of these two lines to our i3 config (usually under `~/.config/i3/config`). I am still undecided whether I actually like the pure keyboard shortcut more than using the mouse-button - time will tell.
+and to run scripts upon a keypress. We can just add either of these two lines to our i3 config (usually under `~/.config/i3/config`). We connect the shortcuts to the key `Print` as this is `flameshot`'s default key for taking screenshots. This of course assumes that flameshot is running in the background. I am still undecided whether I actually like the pure keyboard shortcut more than using the mouse-button - time will tell.
 ```
 bindsym $mod+g exec xdotool key --clearmodifiers Print
 bindsym --whole-window button8 exec xdotool key --clearmodifiers Print
