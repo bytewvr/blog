@@ -8,10 +8,10 @@ code {
 }
 
 // Make table cells fixed width
-.highlighter-rouge .rouge-code {
-  width: 99%;
-  padding-left: 0.5em;
-}
+//.highlighter-rouge .rouge-code {
+//  width: 99%;
+//  padding-left: 0.5em;
+//}
 
 //table.rouge-table {
 //  margin-bottom: 0;
@@ -26,8 +26,9 @@ table.rouge-table {
     vertical-align: top;
     &.rouge-gutter {
       min-width: 3rem;
+      top: 1rem;
       width: 3rem;
-      text-align: right;
+      text-align: center;
     }
     &.rouge-code {
       width: 100%;
