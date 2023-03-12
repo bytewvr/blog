@@ -7,21 +7,12 @@ code {
   background-color: $code-background;
 }
 
-// Make table cells fixed width
-//.highlighter-rouge .rouge-code {
-//  width: 99%;
-//  padding-left: 0.5em;
-//}
-
-table.rouge-table {
-  margin-bottom: 0;
-}
 // Table special formats
-//table{
-//  &.center, &.right, &.left {
-//    width: auto;
-//  }
-//}
+table{
+  &.center, &.right, &.left {
+    width: auto;
+  }
+}
 
 // Code tables
 @import url('https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,400;0,700;1,400;1,700&display=swap');
@@ -29,8 +20,9 @@ table.rouge-table {
 div.highlight {
   position: relative;
   pre.highlight {
-    overflow: initial;
+    overflow: auto;
     border: none;
+    white-space: pre;
   }
 }
 //div.highlight {
