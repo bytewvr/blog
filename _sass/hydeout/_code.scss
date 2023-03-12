@@ -31,6 +31,7 @@ div.highlight {
   pre.highlight {
     overflow: initial;
     border: none;
+    white-space: pre;
   }
 }
 //div.highlight {
@@ -48,10 +49,10 @@ div.highlight {
 //  margin-top: 0.1rem;
 //  }  
 //}
-pre.highlight {
-  overflow-x: auto;
-  white-space: pre;
-}
+//pre.highlight {
+//  overflow-x: auto;
+//  white-space: pre;
+//}
 
 table.rouge-table {
   margin: 0;
