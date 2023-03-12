@@ -28,4 +28,4 @@ bindsym --whole-window button8 exec xdotool key --clearmodifiers Print
 ```
 `xdotool` helps us to emit key events, what helps greatly as my home keyboard is missing the num-pad and also the printkey. Print is at an inconvenient location anyways...
 # Additional Resources
-https://stackoverflow.com/questions/61272019/infinite-loop-of-keypresses-with-i3-bindsym-and-xdotool
+[stackoverflow - keypresses with i3 bindsym and xdotool](https://stackoverflow.com/questions/61272019/infinite-loop-of-keypresses-with-i3-bindsym-and-xdotool)
