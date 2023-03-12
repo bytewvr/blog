@@ -5,8 +5,9 @@ code {
 
 // Make table cells fixed width
 .highlighter-rouge .rouge-code {
-  width: 99%;
+  width: 100%;
   padding-left: 0.5em;
+  overflow-x: auto;
 }
 
 table.rouge-table {
@@ -29,6 +30,5 @@ div.highlight {
   }  
 }
 pre.highlight {
-  overflow-x: auto;
   white-space: pre;
 }
