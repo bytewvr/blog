@@ -23,7 +23,7 @@ table{
 div.highlight {
   position: relative;
   pre.highlight {
-    //overflow: initial;
+    overflow: auto;
     border: none;
     white-space: pre;
   }
