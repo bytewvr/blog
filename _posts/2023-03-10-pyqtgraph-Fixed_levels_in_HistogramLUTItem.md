@@ -8,7 +8,7 @@ tags:
   - pyqtgraph
   - python
 ---
-This short post is about the taming of the pyqtgraph widget [HistogramLUTItem](https://pyqtgraph.readthedocs.io/en/latest/api_reference/graphicsItems/histogramlutitem.html) and preventing a linked `ImageItem` to reverse manually set levels in the histogram.
+This short post is about the taming of the pyqtgraph widget [HistogramLUTItem](https://pyqtgraph.readthedocs.io/en/latest/api_reference/graphicsItems/histogramlutitem.html) and preventing a linked `ImageItem` to update manually set levels in the histogram.
 <!--more-->
 # Problem
 I love the histogram widget that shows the distribution of the grey-levels of an image and can be easily linked to an `ImageItem`  
