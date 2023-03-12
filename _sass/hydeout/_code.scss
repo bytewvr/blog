@@ -1,81 +1,34 @@
-/**
- * Styles for code blocks.
- */
-
 code {
   color: $code-color;
   background-color: $code-background;
 }
 
-//table.rouge-table {
-//  margin-bottom: 0;
-//}
-// Table special formats
-table{
-  &.center, &.right, &.left {
-    width: auto;
-  }
+// Make table cells fixed width
+.highlighter-rouge .rouge-code {
+  width: 99%;
+  padding-left: 0.5em;
 }
-
-// Code tables
-@import url('https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,400;0,700;1,400;1,700&display=swap');
-
-div.highlight {
-  position: relative;
-  pre.highlight {
-    overflow: initial;
-    border: none;
-    white-space: pre;
-  }
-}
-//div.highlight {
-//  padding: 0;
-//  .lineno {
-//    display: inherit;
-//    text-align: right;
-//    padding-right: .1rem;
-//  }
-//  //td.code {
-//  //  overflow-x: auto;
-// // }
-//  td pre {
-//  margin-bottom: 0.1rem;
-//  margin-top: 0.1rem;
-//  }  
-//}
-//pre.highlight {
-//  overflow-x: auto;
-//  white-space: pre;
-//}
 
 table.rouge-table {
-  margin: 0;
-  border-collapse: collapse;
-  table-layout: fixed;
-  td {
-    border: 1px solid #999;
-    margin-bottom: 1rem;
-    vertical-align: top;
-    &.rouge-gutter {
-      min-width: 3rem;
-      width: 3rem;
-      text-align: right;
-    }
-    &.rouge-code {
-      width: 100%;
-      overflow-x: auto;
-      overflow-y: clip;
-      }
-    }
-  pre {
-    border: 0;
-    margin: 0 0.5rem;
-    padding: 0;
-    font-family: 'Source Code Pro', monospace;
-    background: initial;
-    &.lineno {
-      margin: 0 0.2rem;
-    }
-  }
+  margin-bottom: 0;
 }
 
+div.highlight {
+  padding: 0;
+  .lineno {
+    display: inherit;
+    text-align: right;
+    padding-right: .1rem;
+  }
+  //td.code {
+  //  overflow-x: auto;
+ // }
+  td pre {
+  margin-bottom: 0.1rem;
+  margin-top: 0.1rem;
+  }  
+}
+pre.highlight {
+  overflow-x: auto;
+  white-space: pre;
+}
