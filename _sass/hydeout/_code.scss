@@ -71,19 +71,8 @@ table.rouge-table {
       width: 100%;
       overflow-x: auto;
       overflow-y: clip;
-      .copy-button {
-        position: absolute;
-        top: 1rem;
-        right: 1rem;
-        width: 2rem;
-        height: 2rem;
-        opacity: 30%;
-        &:hover {
-          opacity: 90%;
-        }
       }
     }
-  }
   pre {
     border: 0;
     margin: 0 0.5rem;
