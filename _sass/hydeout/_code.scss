@@ -63,12 +63,11 @@ table.rouge-table {
     vertical-align: top;
     &.rouge-gutter {
       min-width: 3rem;
-      top: 1rem;
       width: 3rem;
-      text-align: center;
+      text-align: right;
     }
     &.rouge-code {
-      width: 100%;
+      width: 99%;
       overflow-x: auto;
       overflow-y: clip;
       }
