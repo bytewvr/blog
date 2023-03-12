@@ -1,7 +1,7 @@
 ---
 layout: post
 title: pyqtgraph - Fixed levels in HistogramLUTItem
-category: UI
+category: user interface
 date: 2023-03-10 
 tags:
   - PyQt5
@@ -9,7 +9,6 @@ tags:
   - python
 ---
 This short post is about the taming of the pyqtgraph widget [HistogramLUTItem](https://pyqtgraph.readthedocs.io/en/latest/api_reference/graphicsItems/histogramlutitem.html) and preventing a linked `ImageItem` to reverse manually set levels in the histogram.
-
 <!--more-->
 # Problem
 I love the histogram widget that shows the distribution of the grey-levels of an image and can be easily linked to an `ImageItem`  
@@ -25,7 +24,7 @@ self.histogram = pg.HistogramLUTItem(self.pg_img, fillHistogram=True)
 win.addItem(self.histogram)
 ...
 ```
-Now, say your camera is pushing new images every 1s to  `ImageItem` and you want to keep the max,min levels fixed such that you can do alignment or alike. I initially thought I could prevent these updates in the parent `ViewBox` of the `ImageItem` with methods such as `disableAutoRange()` or inside of the histogram itself with `disableAutoHistogramRange()`. 
+Now, say your camera is pushing new images every 1s to  `ImageItem` and you want to keep the max,min levels fixed such that you can do alignment or alike. I initially thought I could prevent these updates in the parent `ViewBox` of the `ImageItem` with methods such as `disableAutoRange()` or inside of the histogram itself with `disableAutoHistogramRange()` - I was mistaken unfortunately. 
 # Solution
 Whenever the histogram levels are updated there is a `sigLevelsChanged` signal emitted. This is the culprit for resetting our manually set levels. My solution allows the user to toggle between auto-update and allowing to adjust the histogram levels through the widget sliders. Let's check in which mode we are when setting the image data
 ```python
