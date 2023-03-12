@@ -13,15 +13,15 @@ code {
 //  padding-left: 0.5em;
 //}
 
-//table.rouge-table {
-//  margin-bottom: 0;
-//}
-// Table special formats
-table{
-  &.center, &.right, &.left {
-    width: auto;
-  }
+table.rouge-table {
+  margin-bottom: 0;
 }
+// Table special formats
+//table{
+//  &.center, &.right, &.left {
+//    width: auto;
+//  }
+//}
 
 // Code tables
 @import url('https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,400;0,700;1,400;1,700&display=swap');
@@ -67,7 +67,7 @@ table.rouge-table {
       text-align: right;
     }
     &.rouge-code {
-      width: 99%;
+      width: 50%;
       overflow-x: auto;
       overflow-y: clip;
       }
