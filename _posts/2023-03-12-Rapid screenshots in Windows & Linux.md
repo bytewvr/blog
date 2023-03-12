@@ -9,15 +9,14 @@ tags:
   - screenshots
   - file manager
 ---
-Both at work and at home I am heavily using screenshot tools to document findings and highlight meeting content. This short post documents how to assign shortcuts in both windows and Linux for rapid-fire screenshot taking to become more efficient. Both solutions can also be used for other shortcuts and programs. 
+Both at work and at home I am heavily using screenshot tools to document findings and highlight meeting content. This short post documents how to assign shortcuts in both windows and Linux for e.g. rapid-fire screenshot taking. Both solutions can also be used for other shortcuts.
 <!--more-->
 # Windows
-At work I have several tools that I use frequently: the file explorer `MultiCommander`, and the screenshot program `greenshot`. With the tool `autohotkey` we can generate scripts that allow us to reassign the common win+e shortcut to open MultiCommander instead of the windows file explorer. Furthermore, I mapped my two left mouse side-buttons to take a whole screen screenshot (for rapid fire moments) and to open a selection grab.
-The autohotkey script looks like 
+At work I frequently use several tools: the file explorer `MultiCommander`, and the screenshot program `greenshot`. With the tool `autohotkey` we can generate scripts that allow us to reassign keys and map them to launch programs or emit other keys. I mapped my two left mouse side-buttons to take a whole screen screenshot (for rapid fire moments) and to open a selection grab. Furthermore, I reassigned the win+e shortcut to open MultiCommander instead of the windows file explorer. The autohotkey script looks as follows 
 ```
-#e::Run "C:\Users\<username>\Local\MultiCommander (X64)\MultiCommander.exe" "<path_to_startup_folder_left_pane>" "<path_to_startup_folder_right_pane"
 XButton1:F11
 XButton2:Send ^{PrintScreen}
+#e::Run "C:\Users\<username>\Local\MultiCommander (X64)\MultiCommander.exe" "<path_to_startup_folder_left_pane>" "<path_to_startup_folder_right_pane"
 return
 ```
 # Linux
