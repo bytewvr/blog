@@ -7,6 +7,15 @@ code {
   background-color: $code-background;
 }
 
+// Make table cells fixed width
+//.highlighter-rouge .rouge-code {
+//  width: 99%;
+//  padding-left: 0.5em;
+//}
+
+//table.rouge-table {
+//  margin-bottom: 0;
+//}
 // Table special formats
 table{
   &.center, &.right, &.left {
@@ -22,7 +31,6 @@ div.highlight {
   pre.highlight {
     overflow: initial;
     border: none;
-    white-space: pre;
   }
 }
 //div.highlight {
@@ -59,7 +67,7 @@ table.rouge-table {
       text-align: right;
     }
     &.rouge-code {
-      width: 50%;
+      width: 100%;
       overflow-x: auto;
       overflow-y: clip;
       }
